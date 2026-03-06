@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+<meta charset="UTF-8">
+<title>Favoritos</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>⭐ Pokémon Favoritos</h1>
+
+<div class="top-bar">
+
+<button onclick="window.location='index.html'">⬅ Voltar</button>
+
+</div>
+
+<div id="pokemonList"></div>
+
+<script>
+
+const favoritos = JSON.parse(localStorage.getItem("favoritos")) || []
+
+const list = document.getElementById("pokemonList")
+
+list.innerHTML=""
+
+/* se não tiver favoritos */
+
+if(favoritos.length === 0){
+
+list.innerHTML="<p>Nenhum Pokémon favoritado ainda.</p>"
+
+}
+
+/* carregar favoritos */
+
+favoritos.forEach(async id => {
+
+const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+const data = await res.json()
+
+const card = document.createElement("div")
+
+card.className="card"
+
+card.innerHTML=`
+
+<p class="id">#${data.id}</p>
+
+<img src="${data.sprites.front_default}">
+
+<h3>${data.name}</h3>
+
+`
+
+card.onclick=()=>{
+
+window.location=`pokemon.html?id=${id}`
+
+}
+
+list.appendChild(card)
+
+})
+
+</script>
+
+</body>
+</html>

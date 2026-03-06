@@ -1,0 +1,403 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+
+background:linear-gradient(135deg,#ff0000,#3b4cca);
+min-height:100vh;
+color:white;
+text-align:center;
+padding:30px;
+
+}
+
+h1{
+margin-bottom:20px;
+}
+
+/* busca */
+
+#search{
+
+padding:10px;
+border:none;
+border-radius:8px;
+width:260px;
+margin-bottom:20px;
+
+}
+
+/* lista */
+
+#pokemonList{
+
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:20px;
+max-width:1200px;
+margin:auto;
+
+}
+
+/* ======================
+CARD
+====================== */
+
+.card{
+
+background:linear-gradient(145deg,#ffffff,#f3f3f3);
+color:#222;
+border-radius:15px;
+padding:18px;
+text-align:center;
+cursor:pointer;
+position:relative;
+
+transition:
+transform 0.25s ease,
+box-shadow 0.25s ease;
+
+transform-style:preserve-3d;
+
+opacity:0;
+transform:translateY(20px);
+
+animation:cardAppear 0.5s forwards;
+
+}
+
+.card:hover{
+
+transform:
+rotateX(8deg)
+rotateY(-8deg)
+scale(1.05);
+
+box-shadow:
+0 15px 35px rgba(0,0,0,0.4);
+
+}
+
+.card::after{
+
+content:"";
+position:absolute;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:linear-gradient(
+120deg,
+transparent,
+rgba(255,255,255,0.15),
+transparent
+);
+
+opacity:0;
+transition:opacity 0.3s;
+
+border-radius:15px;
+
+}
+
+.card:hover::after{
+opacity:1;
+}
+
+@keyframes cardAppear{
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+/* sprite */
+
+.card img{
+
+width:110px;
+margin:10px 0;
+image-rendering:pixelated;
+background:transparent;
+
+}
+
+.card h3{
+margin-top:10px;
+}
+
+/* ======================
+FAVORITO
+====================== */
+
+.fav-btn{
+
+position:absolute;
+top:8px;
+right:8px;
+
+background:none;
+border:none;
+font-size:22px;
+cursor:pointer;
+
+transition:transform 0.3s;
+
+}
+
+.fav-btn:hover{
+transform:scale(1.3) rotate(15deg);
+}
+
+.fav-btn.active{
+
+color:gold;
+
+animation:starPulse 1s infinite alternate;
+
+}
+
+@keyframes starPulse{
+
+from{
+transform:scale(1);
+filter:drop-shadow(0 0 2px gold);
+}
+
+to{
+transform:scale(1.2);
+filter:drop-shadow(0 0 8px gold);
+}
+
+}
+
+/* ======================
+DETALHE
+====================== */
+
+#pokemonDetail{
+
+display:flex;
+justify-content:center;
+margin-top:40px;
+
+}
+
+.pokemon-card{
+
+background:white;
+color:black;
+padding:30px;
+border-radius:16px;
+width:420px;
+box-shadow:0 20px 40px rgba(0,0,0,0.3);
+
+animation:fadeIn 0.4s ease;
+
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:scale(0.95);
+}
+
+to{
+opacity:1;
+transform:scale(1);
+}
+
+}
+
+.pokemon-card img{
+
+width:180px;
+margin:15px 0;
+
+}
+
+/* descrição */
+
+.description{
+
+margin:15px 0;
+font-style:italic;
+line-height:1.4;
+
+}
+
+/* habilidades */
+
+.abilities{
+
+list-style:none;
+padding:0;
+margin-bottom:20px;
+
+}
+
+.abilities li{
+
+background:#eee;
+margin:5px 0;
+padding:6px;
+border-radius:6px;
+text-transform:capitalize;
+
+}
+
+/* ======================
+STATS
+====================== */
+
+.stat{
+
+margin-bottom:10px;
+
+}
+
+.bar{
+
+height:10px;
+background:#ddd;
+border-radius:6px;
+overflow:hidden;
+
+}
+
+.fill{
+
+height:10px;
+background:#4CAF50;
+width:0%;
+transition:1s;
+
+}
+
+/* ======================
+NAVEGAÇÃO
+====================== */
+
+.nav{
+
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+
+}
+
+.nav button{
+
+padding:8px 12px;
+border:none;
+background:black;
+color:white;
+border-radius:6px;
+cursor:pointer;
+
+}
+
+/* ======================
+EVOLUÇÕES
+====================== */
+
+#evolutions{
+
+display:flex;
+justify-content:center;
+gap:20px;
+margin-top:15px;
+
+}
+
+.evo{
+
+text-align:center;
+
+}
+
+.evo img{
+
+width:90px;
+
+}
+
+/* ======================
+FORMAS (Mega / Alola / etc)
+====================== */
+
+.forms{
+
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+margin-bottom:20px;
+
+}
+
+.form-btn{
+
+background:linear-gradient(135deg,#ffcc00,#ff9900);
+border:none;
+padding:8px 14px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+color:#222;
+
+transition:0.2s;
+
+box-shadow:0 3px 6px rgba(0,0,0,0.2);
+
+}
+
+.form-btn:hover{
+
+transform:scale(1.08);
+background:linear-gradient(135deg,#ffd633,#ffb300);
+
+}
+
+/* ======================
+FAVORITOS PAGE
+====================== */
+
+.favorites-page #pokemonList{
+
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+
+}
+
+/* ======================
+ANIME MODE
+====================== */
+
+.anime-mode{
+
+background:#d62828;
+
+}
+
+.anime-mode .card{
+
+background:black;
+color:white;
+border:4px solid #ffcc00;
+
+}
+
+.anime-mode h1{
+
+color:#ffcc00;
+
+}
