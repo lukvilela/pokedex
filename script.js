@@ -1,7 +1,31 @@
-const api = "https://pokeapi.co/api/v2/pokemon?limit=1025"
+﻿const api = "https://pokeapi.co/api/v2/pokemon?limit=1025"
+const MAX_POKEMON_ID = 1025
 
 function capitalize(text){
 return text.charAt(0).toUpperCase()+text.slice(1)
+}
+
+
+function escapeHtml(text){
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/\"/g,"&quot;")
+.replace(/'/g,"&#39;")
+}
+
+async function fetchJson(url){
+const res = await fetch(url)
+if(!res.ok){
+throw new Error("Falha ao carregar " + url + " (" + res.status + ")")
+}
+return res.json()
+}
+
+function renderError(container, message){
+if(!container) return
+container.innerHTML = "<p>" + escapeHtml(message) + "</p>"
 }
 
 /* =========================
@@ -42,8 +66,7 @@ async function carregarPokemons(){
 const list = document.getElementById("pokemonList")
 if(!list) return
 
-const res = await fetch(api)
-const data = await res.json()
+const data = await fetchJson(api)
 
 list.innerHTML=""
 
@@ -66,9 +89,9 @@ card.innerHTML=`
 <img loading="lazy"
 src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png">
 
-<h3>${capitalize(pokemon.name)}</h3>
+<h3>${escapeHtml(capitalize(pokemon.name))}</h3>
 
-<button class="fav-btn ${favoritos.includes(id) ? 'active' : ''}">⭐</button>
+<button class="fav-btn ${favoritos.includes(id) ? 'active' : ''}">&#9733;</button>
 
 `
 
@@ -154,11 +177,9 @@ const params=new URLSearchParams(window.location.search)
 const id=params.get("id")
 if(!id) return
 
-const res=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-const data=await res.json()
+const data=await fetchJson(["https:","","pokeapi.co","api","v2","pokemon",id].join("/"))
+const speciesData=await fetchJson(data.species.url)
 
-const speciesRes=await fetch(data.species.url)
-const speciesData=await speciesRes.json()
 
 /* descrição */
 
@@ -181,7 +202,7 @@ if(!shinySprite) shinySprite=normalSprite
 /* habilidades */
 
 const abilities=data.abilities.map(a=>`
-<li>${capitalize(a.ability.name)}</li>
+<li>${escapeHtml(capitalize(a.ability.name))}</li>
 `).join("")
 
 /* stats */
@@ -194,7 +215,7 @@ return`
 
 <div class="stat">
 
-<span>${capitalize(stat.stat.name)} (${stat.base_stat})</span>
+<span>${escapeHtml(capitalize(stat.stat.name))} (${stat.base_stat})</span>
 
 <div class="bar">
 <div class="fill" data-value="${percent}"></div>
@@ -222,8 +243,8 @@ let label = name
 .replace("-paldea"," Paldea")
 
 return `
-<button class="form-btn" onclick="abrirForma('${name}')">
-${capitalize(label)}
+<button class="form-btn" onclick="abrirForma(decodeURIComponent('${encodeURIComponent(name)}'))">
+${escapeHtml(capitalize(label))}
 </button>
 `
 
@@ -238,12 +259,12 @@ div.innerHTML=`
 <div class="pokemon-card">
 
 <div class="nav">
-<button onclick="mudarPokemon(${id-1})">←</button>
+<button onclick="mudarPokemon(${id-1})">&larr;</button>
 <button onclick="voltarLista()">Lista</button>
-<button onclick="mudarPokemon(${parseInt(id)+1})">→</button>
+<button onclick="mudarPokemon(${parseInt(id)+1})">&rarr;</button>
 </div>
 
-<h1>${capitalize(data.name)}</h1>
+<h1>${escapeHtml(capitalize(data.name))}</h1>
 
 <img id="pokemonSprite" src="${normalSprite}">
 
@@ -252,9 +273,9 @@ div.innerHTML=`
 ${forms}
 </div>
 
-<button onclick="toggleShiny()">✨ Shiny</button>
+<button onclick="toggleShiny()">&#10024; Shiny</button>
 
-<p class="description">${description}</p>
+<p class="description">${escapeHtml(description)}</p>
 
 <h3>Habilidades</h3>
 <ul class="abilities">
@@ -267,7 +288,7 @@ ${stats}
 <h3>Evoluções</h3>
 <div id="evolutions"></div>
 
-<button onclick="favoritar(${id})">⭐ Favoritar</button>
+<button onclick="favoritar(${id})">&#9733; Favoritar</button>
 
 </div>
 
@@ -307,15 +328,17 @@ FORMAS
 
 async function abrirForma(nome){
 
-const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nome}`)
-const data = await res.json()
-
+try{
+const data = await fetchJson(["https:","","pokeapi.co","api","v2","pokemon",nome].join("/"))
 const sprite = data.sprites?.other?.["official-artwork"]?.front_default
-
 document.getElementById("pokemonSprite").src = sprite
 
 tocarSom(data.name)
 
+
+}catch(error){
+console.error(error)
+}
 }
 
 /* =========================
@@ -324,11 +347,10 @@ EVOLUÇÕES
 
 async function buscarEvolucoes(url){
 
-const res=await fetch(url)
-const data=await res.json()
-
+try{
+const data=await fetchJson(url)
 const container=document.getElementById("evolutions")
-
+if(!container) return
 let evolutions=[]
 
 function extrair(chain){
@@ -349,12 +371,16 @@ container.innerHTML=evolutions.map(name=>`
 
 <img src="https://img.pokemondb.net/sprites/home/normal/${name}.png">
 
-<p>${capitalize(name)}</p>
+<p>${escapeHtml(capitalize(name))}</p>
 
 </div>
 
 `).join("")
 
+
+}catch(error){
+console.error(error)
+}
 }
 
 /* =========================
@@ -392,7 +418,7 @@ document.querySelectorAll(".card").forEach(card=>{
 
 const name=card.innerText.toLowerCase()
 
-card.style.display=name.includes(value) ? "block":"none"
+card.style.display=name.includes(value) ? "":"none"
 
 })
 
@@ -402,7 +428,7 @@ card.style.display=name.includes(value) ? "block":"none"
 FAVORITOS PAGE
 ========================= */
 
-function carregarFavoritos(){
+async function carregarFavoritos(){
 
 const list=document.getElementById("pokemonList")
 if(!list) return
@@ -498,8 +524,8 @@ NAVEGAÇÃO
 
 function mudarPokemon(id){
 
-if(id<1) id=1025
-if(id>1025) id=1
+if(id<1) id=MAX_POKEMON_ID
+if(id>MAX_POKEMON_ID) id=1
 
 window.location=`pokemon.html?id=${id}`
 
@@ -515,6 +541,25 @@ window.location="index.html"
 INIT
 ========================= */
 
-carregarPokemons()
-carregarPokemon()
-carregarFavoritos()
+
+const page = window.location.pathname.split("/").pop().toLowerCase()
+
+if(page === "" || page === "index.html"){
+carregarPokemons().catch(()=>renderError(document.getElementById("pokemonList"),"Nao foi possivel carregar a Pokedex agora."))
+}
+
+if(page === "pokemon.html"){
+carregarPokemon().catch(()=>renderError(document.getElementById("pokemonDetail"),"Nao foi possivel carregar este Pokemon."))
+}
+
+if(page === "favoritos.html"){
+carregarFavoritos().catch(()=>renderError(document.getElementById("pokemonList"),"Nao foi possivel carregar seus favoritos."))
+}
+
+
+
+
+
+
+
+
